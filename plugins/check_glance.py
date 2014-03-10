@@ -56,6 +56,10 @@ def collect_args():
         help='name of images who must be available')
   parser.add_argument('--region_name', metavar='region_name', type=str,
         help='Region to select for authentication')
+  parser.add_argument('--ca-cert', metavar='ca_cert', type=str,
+                    help='Location of the CA cert for validation')
+  parser.add_argument('--insecure', action='store_true', default=False,
+                    help='Do not verify certificates')
   return parser
 
 
@@ -115,12 +119,14 @@ if __name__ == '__main__':
     ks_client = ksclient.Client(username=args.username,
                                 password=args.password,
                                 tenant_name=args.tenant,
-                                auth_url=args.auth_url)
+                                auth_url=args.auth_url,
+                                cacert=args.ca_cert,
+                                insecure=args.insecure)
 
     token = ks_client.auth_token
     endpoint = ks_client.service_catalog.url_for(service_type='image')
 
-    c = glance_client.Client('1', endpoint, token=token)
+    c = glance_client.Client('1', endpoint, token=token, cacert=args.ca_cert, insecure=args.insecure)
     sys.exit(check_glance(c, args))
   except Exception as e:
     print str(e)

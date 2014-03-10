@@ -50,6 +50,10 @@ parser.add_argument('--region_name', metavar='region_name', type=str,
                     help='Region to select for authentication')
 parser.add_argument('--no-admin', action='store_true', default=False,
                     help='Don\'t perform admin tests, useful if user is not admin')
+parser.add_argument('--ca-cert', metavar='ca_cert', type=str,
+                    help='Location of CA validation cert')
+parser.add_argument('--insecure', action='store_true', default=False,
+                    help='Do not perform certificate validation')
 parser.add_argument('services', metavar='SERVICE', type=str, nargs='*',
                     help='services to check for')
 args = parser.parse_args()
@@ -60,7 +64,9 @@ try:
                   tenant_name=args.tenant,
                   password=args.password,
                   auth_url=args.auth_url,
-                  region_name=args.region_name)
+                  region_name=args.region_name,
+		          cacert=args.ca_cert,
+		          insecure=args.insecure)
     if not c.authenticate():
         raise Exception("Authentication failed")
     if not args.no_admin:
@@ -89,5 +95,5 @@ if msgs:
     print ", ".join(msgs)
     sys.exit(STATE_WARNING)
 
-print "Got token %s for user %s and tenant %s" % (c.auth_token, c.auth_user_id, c.auth_tenant_id)
+print "Got token for user %s and tenant %s" % (c.auth_user_id, c.auth_tenant_id)
 sys.exit(STATE_OK)

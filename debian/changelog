@@ -1,0 +1,25 @@
+nagios-plugins-openstack (1.20140310-1) unstable; urgency=low
+
+  * Removed token from check_keystone plugin output
+
+ -- Ricardo Rocha <ricardo@rocha-desk>  Mon, 10 Mar 2014 17:01:37 +1300
+
+nagios-plugins-openstack (1.20140220-1ubuntu1) saucy; urgency=low
+
+  * Added cacert/insecure options to check_glance/keystone
+
+ -- Ricardo Rocha <rocha@rocha-x11>  Thu, 20 Feb 2014 11:01:03 +1300
+
+nagios-plugins-openstack (1.20120627-2) unstable; urgency=low
+
+  * Add missing author from copyright file: Ignace Mouzannar
+  
+  * Use .install file instead of manually installing in the debian/rules file
+
+ -- Loic Dachary (OuoU) <loic@debian.org>  Wed, 27 Jun 2012 15:27:19 +0200
+
+nagios-plugins-openstack (1.20120627-1) unstable; urgency=low
+
+  * Initial release (Closes: #675031).
+
+ -- Loic Dachary (OuoU) <loic@debian.org>  Tue, 26 Jun 2012 23:25:06 +0200
