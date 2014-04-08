@@ -1,1 +1,2 @@
-plugins/*     /usr/lib/nagios/plugins/
+plugins/*       /usr/lib/nagios/plugins/
+eventhandlers/* /usr/lib/nagios/eventhandlers/
