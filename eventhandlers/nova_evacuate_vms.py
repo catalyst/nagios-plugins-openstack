@@ -26,11 +26,13 @@ import random
 import re
 import sys
 import syslog
+from datetime import datetime, timedelta
+import time
 from keystoneclient.v2_0 import client as kclient
 from keystoneclient import exceptions
 from novaclient.v1_1 import client as nclient
 
-syslog.openlog('icinga-nova-evacuate', 0, syslog.LOG_USER)
+syslog.openlog('nagios-nova-evacuate', 0, syslog.LOG_USER)
 
 #
 # State ID values for HOST states in nagios
@@ -59,8 +61,8 @@ parser.add_argument('--insecure', action='store_true', default=False,
     help='Do not perform certificate validation')
 parser.add_argument('--unreachable-is-down', action='store_true', default=False,
     help='True if we trigger evacuate on node unreachable')
-parser.add_argument('--compute-host-regex', metavar='compute_host_regex', type=str,
-    default='.*comp.*', help='True if we trigger evacuate on node unreachable')
+parser.add_argument('--wait-timeout', metavar='wait_timeout', default=30,
+    help='Time (in seconds) to wait for a successful evacuation before reporting failure')
 parser.add_argument('compute_host', metavar='compute_host', type=str,
     help='Hostname of the compute node to evacuate')
 parser.add_argument('state', metavar='state', type=str,
@@ -91,38 +93,64 @@ except Exception as e:
 
 # Check nova-compute is marked down for the compute host
 for binary in ['nova-compute']:
-  service_state = nova.services.list(host=args.compute_host, binary=binary)
-  if len(service_state) != 1:
-    syslog.syslog(syslog.LOG_ERR, "Got more than one %s on host %s" % (binary, args.compute_host))
-    sys.exit(-1)
-  if service_state.pop().state != 'down':
-    syslog.syslog(syslog.LOG_ERR, "Nagios says down, but %s is still up in %s when querying nova" % (
-        binary, args.compute_host))
+  try:
+    service_state = nova.services.list(host=args.compute_host, binary=binary)
+
+    if len(service_state) != 1:
+      syslog.syslog(syslog.LOG_ERR, "Got more than one %s on host %s" % (binary, args.compute_host))
+      sys.exit(-1)
+    if service_state.pop().state != 'down':
+      syslog.syslog(syslog.LOG_ERR, "Nagios says down, but %s is still up in %s when querying nova" % (
+          binary, args.compute_host))
+      sys.exit(-1)
+  except Exception as e:
+    syslog.syslog(syslog.LOG_ERR, "Failed to list services %s for host %s :: %s" % (
+      binary, args.compute_host, e))
     sys.exit(-1)
 
 # List VMs associated to that compute node
-vms = nova.servers.list(search_opts={'host': args.compute_host})
+try:
+  vms = nova.servers.list(search_opts={'host': args.compute_host})
+except Exception as e:
+  syslog.syslog(syslog.LOG_ERR, "Failed to list VMs for host %s :: %s" % (args.compute_host, e))
+  sys.exit(-1)
 
-# Trigger evacuate for each of the VMs
+# Build target list (for the round robin approach)
 # TODO: we should be using the scheduler instead of only a random assign
 # https://blueprints.launchpad.net/nova/+spec/flexible-evacuate-scheduler
 current_host = None
-compute_regex = re.compile(args.compute_host_regex)
+targets = []
 try:
-  hosts = nova.hosts.list()
+  services = nova.services.list()
+  for service in services:
+    if service.binary == 'nova-compute' and service.host != args.compute_host:
+      targets.append(service.host)
 except Exception as e:
-  syslog.syslog(syslog.LOG_ERR, "Failed to list hosts :: %s" % e)
-for host in hosts:
-  if host.host_name == args.compute_host:
-    current_host = host
-    hosts.remove(current_host)
-  elif compute_regex.match(host.host_name) is None:
-    hosts.remove(host)
+  syslog.syslog(syslog.LOG_ERR, "Failed while filtering target hosts from service list :: %s" % e)
+  sys.exit(-1)
 
+# Trigger evacuation for each VM
+# We collect the results to build a final report
+results = {'success': [], 'failures': []}
 for vm in vms:
-  target = random.choice(hosts).host_name
+  target = random.choice(targets)
   syslog.syslog("Evacuating '%s' to compute host '%s'" % (vm.name, target))
   try:
+    success = False
     vm.evacuate(target, True)
+    # wait for ACTIVE, or give up after 30 seconds
+    start = datetime.now()
+    cvm = nova.servers.list(search_opts={'name': vm.name})
+    while datetime.now() < (start + timedelta(seconds=args.wait_timeout)):
+      if cvm[0].status == 'ACTIVE':
+        results['success'].append((vm.name, target))
+        break
+      time.sleep(3)
+      cvm = nova.servers.list(search_opts={'name': vm.name})
+    if cvm[0].status != 'ACTIVE':
+      results['failures'].append((vm.name, "VM is in ERROR or UNKNOWN status, needs manual migration"))
   except Exception as e:
+    results['failures'].append((vm.name, str(e)))
     syslog.syslog(syslog.LOG_ERR, "Failed to evacuate vm '%s' :: %s" % (vm.name, e))
+syslog.syslog(syslog.LOG_ERR, "Evacuation of %s :: Successes (%d, %s) :: Failures (%d, %s)" % (
+  args.compute_host, len(results['success']), results['success'], len(results['failures']), results['failures']))
