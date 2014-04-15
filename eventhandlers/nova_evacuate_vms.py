@@ -61,7 +61,7 @@ parser.add_argument('--insecure', action='store_true', default=False,
     help='Do not perform certificate validation')
 parser.add_argument('--unreachable-is-down', action='store_true', default=False,
     help='True if we trigger evacuate on node unreachable')
-parser.add_argument('--wait-timeout', metavar='wait_timeout', default=30,
+parser.add_argument('--wait-timeout', metavar='wait_timeout', default=10,
     help='Time (in seconds) to wait for a successful evacuation before reporting failure')
 parser.add_argument('compute_host', metavar='compute_host', type=str,
     help='Hostname of the compute node to evacuate')
