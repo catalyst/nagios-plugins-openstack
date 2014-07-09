@@ -19,7 +19,8 @@ tar zcvf nagios-plugins-openstack_1.20140710.orig.tar.gz nagios-plugins-openstac
 cd nagios-plugins-openstack
 dpkg-buildpackage -rfakeroot -d -us -uc -S
 cd ..
-dput -f ppa:catalystit/openstack nagios-plugins-openstack_1.20140710-1_amd64.changes
+debsign nagios-plugins-openstack_1.20140710-1_source.changes
+dput -f ppa:catalystit/openstack nagios-plugins-openstack_1.20140710-1_source.changes
 ```
 
 

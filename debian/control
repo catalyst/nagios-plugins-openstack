@@ -12,7 +12,7 @@ Vcs-Git: git://anonscm.debian.org/openstack/nagios-plugins-openstack.git
 
 Package: nagios-plugins-openstack
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, python2.7 | python2.6, python (>= 2.6), python-keystoneclient
+Depends: ${shlibs:Depends}, ${misc:Depends}, python2.7 | python2.6, python (>= 2.6), python-keystoneclient, python-nose
 Description: Plugins for nagios compatible monitoring OpenStack based systems
  This package provides various plugins for Nagios compatible monitoring
  systems like Nagios and Icinga.

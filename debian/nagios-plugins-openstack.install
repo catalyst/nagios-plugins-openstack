@@ -1,2 +1,0 @@
-plugins/*       /usr/lib/nagios/plugins/
-eventhandlers/* /usr/lib/nagios/eventhandlers/
