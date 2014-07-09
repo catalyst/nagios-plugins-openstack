@@ -1,8 +1,14 @@
-nagios-plugins-openstack (1.20140408-1) unstable; urgency=low
+nagios-plugins-openstack (1.20140710-1) precise; urgency=low
+
+  * Added check_tempest.py probe
+
+ -- Ricardo Rocha <ricardo@catalyst.net.nz>  Thu, 10 Jul 2014 11:01:37 +1300
+
+nagios-plugins-openstack (1.20140416-1) unstable; urgency=low
 
   * Added event handler for automated nova evacuate
 
- -- Ricardo Rocha <ricardo@rocha-desk>  Tue, 08 Apr 2014 17:01:37 +1300
+ -- Ricardo Rocha <ricardo@rocha-desk>  Wed, 16 Apr 2014 17:01:37 +1300
 
 nagios-plugins-openstack (1.20140310-1) unstable; urgency=low
 

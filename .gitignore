@@ -1,1 +1,3 @@
 *.swp
+debian/files
+debian/nagios-plugins-openstack*

@@ -24,6 +24,9 @@
 #   This nagios plugin launches one or more tempest tests, collects results
 #   and sets the result state accordingly.
 #
+# Example usage:
+#   ./check_tempest.py -l /usr/share/python-tempest -r 'test.api.image.v2.*'
+#
 
 import argparse
 import nose
@@ -45,6 +48,8 @@ def collect_args():
       required=True, help='Location of the tests to be run')
   parser.add_argument('-r', '--regexp', dest='regexp', type=str, action='store',
       required=True, help='Do not verify certificates')
+  parser.add_argument('-w','--failiswarn', dest='failiswarn', action='store_true',
+      help='return warn on failure (default is critical)')
   return parser
 
 def check_tempest(args):
@@ -54,7 +59,11 @@ def check_tempest(args):
 
   if success:
     return STATE_OK
-  return STATE_CRITICAL
+
+  if args.failiswarn:
+    return STATE_WARNING
+  else:
+    return STATE_CRITICAL
 
 if __name__ == '__main__':
   args = collect_args().parse_args()
