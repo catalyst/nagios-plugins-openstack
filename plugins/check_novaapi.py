@@ -29,7 +29,7 @@ import sys
 import argparse
 
 from novaclient.v1_1 import client
-
+from utils import EnvDefault
 
 STATE_OK = 0
 STATE_WARNING = 1
@@ -49,18 +49,14 @@ def return_state(state):
 
 def collect_args():
   parser = argparse.ArgumentParser(description='Check an OpenStack glance server.')
-  parser.add_argument('--auth_url', metavar='URL', type=str,
-        required=True,
-        help='Keystone URL')
-  parser.add_argument('--username', metavar='username', type=str,
-        required=True,
-        help='username to use for authentication')
-  parser.add_argument('--password', metavar='password', type=str,
-        required=True,
-        help='password to use for authentication')
-  parser.add_argument('--tenant', metavar='tenant', type=str,
-        required=True,
-        help='tenant name to use for authentication')
+  parser.add_argument('--auth_url', metavar='URL', type=str, required=True,
+        action=EnvDefault, envvar='OS_AUTH_URL', help='Keystone URL')
+  parser.add_argument('--username', metavar='username', type=str, required=True,
+        action=EnvDefault, envvar='OS_USERNAME', help='username to use for authentication')
+  parser.add_argument('--password', metavar='password', type=str, required=True,
+        action=EnvDefault, envvar='OS_PASSWORD', help='password to use for authentication')
+  parser.add_argument('--tenant', metavar='tenant', type=str, required=True,
+        action=EnvDefault, envvar='OS_TENANT_NAME', help='tenant name to use for authentication')
   return parser
 
 def check_novaapi(nt):
