@@ -1,8 +1,8 @@
-nagios-plugins-openstack (1.20140715-1) precise; urgency=low
+nagios-plugins-openstack (1.20140716.2-1) precise; urgency=low
 
   * Added check_graphite.py
 
- -- Ricardo Rocha <ricardo@catalyst.net.nz>  Tue, 15 Jul 2014 13:34:37 +1300
+ -- Ricardo Rocha <ricardo@catalyst.net.nz>  Wed, 16 Jul 2014 13:34:37 +1300
 
 nagios-plugins-openstack (1.20140710-1) precise; urgency=low
 
