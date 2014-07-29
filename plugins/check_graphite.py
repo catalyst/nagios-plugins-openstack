@@ -62,6 +62,8 @@ def collect_args():
     required=True, help='Interval to query for (check \'from\' in graphite)')
   parser.add_argument('-w','--failiswarn', dest='failiswarn', action='store_true',
       help='Return warn on failure (default is critical)')
+  parser.add_argument('-v','--verbose', dest='verbose', action='store_true',
+      help='Print some additional information')
   return parser
 
 def check_graphite(args):
@@ -70,10 +72,15 @@ def check_graphite(args):
     args.proto, args.host, args.port, args.subpath, args.target, args.interval)
 
   result = urllib2.urlopen(query).read()
+  if args.verbose:
+    print result
   jsonres = json.loads(result)
 
   if len(jsonres) > 0 and len(jsonres[0]['datapoints']) > 0:
+    print "OK: query %s retrieved %d elements" % (query, len(jsonres[0]['datapoints']))
     return STATE_OK
+
+  print "Failed: query %s returned %s" % (query, result)
 
   if args.failiswarn:
     return STATE_WARNING
@@ -85,5 +92,5 @@ if __name__ == '__main__':
   try:
     check_graphite(args)
   except Exception as e:
-    traceback.print_exc()
+    print "Failed: %s" % str(e)
     sys.exit(STATE_CRITICAL)
