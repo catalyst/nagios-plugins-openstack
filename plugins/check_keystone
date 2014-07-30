@@ -54,8 +54,6 @@ parser.add_argument('--insecure', action='store_true', default=False,
 parser.add_argument('services', metavar='SERVICE', type=str, nargs='*',
                     help='services to check for')
 args = parser.parse_args()
-print args
-
 
 try:
     c = client.Client(username=args.username,
