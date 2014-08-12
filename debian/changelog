@@ -1,3 +1,9 @@
+nagios-plugins-openstack (1.20140730-1) precise; urgency=low
+
+  * Added support for passing args via env vars
+
+ -- Ricardo Rocha <ricardo@catalyst.net.nz>  Wed, 30 Jul 2014 16:56:37 +1300
+
 nagios-plugins-openstack (1.20140716.2-1) precise; urgency=low
 
   * Added check_graphite.py
