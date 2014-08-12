@@ -25,6 +25,7 @@ import sys
 import argparse
 from keystoneclient.v2_0 import client
 from keystoneclient import exceptions
+from utils import EnvDefault
 
 
 STATE_OK = 0
@@ -34,29 +35,26 @@ STATE_UNKNOWN = 3
 
 
 parser = argparse.ArgumentParser(description='Check an OpenStack Keystone server.')
-parser.add_argument('--auth_url', metavar='URL', type=str,
-                    required=True,
-                    help='Keystone URL')
-parser.add_argument('--username', metavar='username', type=str,
-                    required=True,
-                    help='username to use for authentication')
+parser.add_argument('--auth_url', metavar='URL', type=str, required=True,
+                    action=EnvDefault, envvar='OS_AUTH_URL', help='Keystone URL')
+parser.add_argument('--username', metavar='username', type=str, required=True,
+                    action=EnvDefault, envvar='OS_USERNAME', help='username to use for authentication')
 parser.add_argument('--password', metavar='password', type=str,
-                    required=True,
-                    help='password to use for authentication')
+                    action=EnvDefault, envvar='OS_PASSWORD', help='password to use for authentication')
 parser.add_argument('--tenant', metavar='tenant', type=str,
-                    required=True,
-                    help='tenant name to use for authentication')
+                    action=EnvDefault, envvar='OS_TENANT_NAME', help='tenant name to use for authentication')
 parser.add_argument('--region_name', metavar='region_name', type=str,
-                    help='Region to select for authentication')
+                    action=EnvDefault, envvar='OS_REGION_NAME', help='Region to select for authentication')
 parser.add_argument('--no-admin', action='store_true', default=False,
                     help='Don\'t perform admin tests, useful if user is not admin')
 parser.add_argument('--ca-cert', metavar='ca_cert', type=str,
-                    help='Location of CA validation cert')
+                    action=EnvDefault, envvar='OS_CACERT', help='Location of CA validation cert')
 parser.add_argument('--insecure', action='store_true', default=False,
                     help='Do not perform certificate validation')
 parser.add_argument('services', metavar='SERVICE', type=str, nargs='*',
                     help='services to check for')
 args = parser.parse_args()
+print args
 
 
 try:

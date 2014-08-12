@@ -27,6 +27,7 @@ import argparse
 
 from keystoneclient.v2_0 import client as ksclient
 import glanceclient as glance_client
+from utils import EnvDefault
 
 STATE_OK = 0
 STATE_WARNING = 1
@@ -36,18 +37,14 @@ STATE_UNKNOWN = 3
 def collect_args():
 
   parser = argparse.ArgumentParser(description='Check an OpenStack glance server.')
-  parser.add_argument('--auth_url', metavar='URL', type=str,
-        required=True,
-        help='Keystone URL')
-  parser.add_argument('--username', metavar='username', type=str,
-        required=True,
-        help='username to use for authentication')
-  parser.add_argument('--password', metavar='password', type=str,
-        required=True,
-        help='password to use for authentication')
-  parser.add_argument('--tenant', metavar='tenant', type=str,
-        required=True,
-        help='tenant name to use for authentication')
+  parser.add_argument('--auth_url', metavar='URL', type=str, required=True,
+        action=EnvDefault, envvar='OS_AUTH_URL', help='Keystone URL')
+  parser.add_argument('--username', metavar='username', type=str, required=True,
+        action=EnvDefault, envvar='OS_USERNAME', help='username to use for authentication')
+  parser.add_argument('--password', metavar='password', type=str, required=True,
+        action=EnvDefault, envvar='OS_PASSWORD', help='password to use for authentication')
+  parser.add_argument('--tenant', metavar='tenant', type=str, required=True,
+        action=EnvDefault, envvar='OS_TENANT_NAME', help='tenant name to use for authentication')
   parser.add_argument('--req_count', metavar='numberImages', type=str,
         required=False,
         help='minimum number of images in glance')
@@ -55,9 +52,9 @@ def collect_args():
         required=False,
         help='name of images who must be available')
   parser.add_argument('--region_name', metavar='region_name', type=str,
-        help='Region to select for authentication')
+        action=EnvDefault, envvar='OS_REGION_NAME', help='Region to select for authentication')
   parser.add_argument('--ca-cert', metavar='ca_cert', type=str,
-                    help='Location of the CA cert for validation')
+                    action=EnvDefault, envvar='OS_CACERT', help='Location of the CA cert for validation')
   parser.add_argument('--insecure', action='store_true', default=False,
                     help='Do not verify certificates')
   return parser
