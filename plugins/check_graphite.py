@@ -90,7 +90,7 @@ def check_graphite(args):
 if __name__ == '__main__':
   args = collect_args().parse_args()
   try:
-    check_graphite(args)
+    sys.exit(check_graphite(args))
   except Exception as e:
     print "Failed: %s" % str(e)
     sys.exit(STATE_CRITICAL)
