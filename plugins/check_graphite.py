@@ -76,9 +76,12 @@ def check_graphite(args):
     print result
   jsonres = json.loads(result)
 
-  if len(jsonres) > 0 and len(jsonres[0]['datapoints']) > 0:
-    print "OK: query %s retrieved %d elements" % (query, len(jsonres[0]['datapoints']))
-    return STATE_OK
+  if jsonres:
+    dps = jsonres[0]['datapoints']
+    all_null = all([dp[0] is None for dp in dps])
+    if len(dps) > 0 and not all_null:
+      print "OK: query %s retrieved %d elements" % (query, len(jsonres[0]['datapoints']))
+      return STATE_OK
 
   print "Failed: query %s returned %s" % (query, result)
 
